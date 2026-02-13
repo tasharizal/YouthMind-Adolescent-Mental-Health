@@ -1,0 +1,148 @@
+/* =================================================================
+   1. CONTROL PANEL (VARIABLES)
+   Adjust these numbers to fix the layout instantly.
+   ================================================================= */
+:root {
+    /* Colors */
+    --bg-dark: #1E1E1E;
+    --border-color: #333;
+    --text-primary: #FAFAFA;
+    --accent-red: #FF4B4B;
+
+    /* Spacing Control */
+    --card-padding: 1rem;       /* Padding inside the grey chart boxes */
+    
+    /* GAP FIXER: Negative numbers pull rows closer together */
+    --row-gap-adjustment: -2rem; 
+}
+
+/* =================================================================
+   2. GLOBAL SETTINGS
+   ================================================================= */
+html, body, [class*="css"] {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Main Container Spacing */
+.block-container {
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+/* CRITICAL: Remove default Streamlit gaps between components */
+.main [data-testid="stVerticalBlock"] {
+    gap: 0.5rem !important; /* Reduces the default huge gap */
+}
+
+/* =================================================================
+   3. KPI CARDS (Top Row)
+   ================================================================= */
+div[data-testid="stMetric"] {
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    text-align: center;
+    margin-bottom: -25px !important; 
+    height: 95px !important; 
+    min-height: 80px !important; 
+    max-height: 100px !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+div[data-testid="stMetricValue"] {
+    font-size: 24px !important; 
+    color: #4DA6FF !important; /* This keeps your numbers blue */
+    font-weight: bold;
+    padding-bottom: 2px !important;
+}
+
+div[data-testid="stMetricLabel"] {
+    font-size: 14px;
+    color: #B0B0B0;
+}
+
+/* --- KPI COLOR  --- */
+
+/* 1. Remove transparency so colors look vivid like your images */
+[data-testid="stMetricDelta"] > div {
+    opacity: 1 !important;
+    font-weight: bold !important;
+}
+
+/* 2. Global Rule: Arrows UP = Red, Arrows DOWN = Green (Mental Health) */
+[data-testid="stMetricDelta"] > div[data-direction="up"] {
+    color: #FF4B4B !important; 
+}
+[data-testid="stMetricDelta"] > div[data-direction="down"] {
+    color: #00FF7F !important;
+}
+
+/* 3. PHYSICAL ACTIVITY FIX (3rd Card Only) */
+/* This forces the 3rd card to show GREEN for an increase (+) */
+[data-testid="stHorizontalBlock"] > div:nth-of-type(3) [data-testid="stMetricDelta"] > div[data-direction="up"] {
+    color: #00FF7F !important;
+}
+/* This forces the 3rd card to show RED for a decrease (-) */
+[data-testid="stHorizontalBlock"] > div:nth-of-type(3) [data-testid="stMetricDelta"] > div[data-direction="down"] {
+    color: #FF4B4B !important;
+}
+
+/* 4. Ensure the Arrow icon matches the text color */
+[data-testid="stMetricDelta"] svg {
+    fill: currentColor !important;
+}
+
+/* =================================================================
+   4. CHART CONTAINERS (The Grey Boxes)
+   ================================================================= */
+/* Target the "st.container(border=True)" wrapper */
+div[data-testid="stVerticalBlockBorderWrapper"] > div > div {
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: var(--card-padding) !important; /* Uses variable from top */
+    margin-bottom: 5rem !important;
+}
+
+/* Headers inside charts (h4) */
+h4 {
+    color: var(--text-primary);
+    font-weight: 400;
+    margin-top: 0px;
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+/* Fix Plotly Margins */
+.js-plotly-plot {
+    margin: 0rem !important;
+    height: auto !important;
+}
+
+/* =================================================================
+   5. ROW TARGETING (THE GAP FIXER)
+   This moves specific rows up/down based on their order.
+   ================================================================= */
+
+/* Targeting st.columns groups inside the main area.
+   nth-of-type(2) = The "Anxiety & Covid" Row
+   nth-of-type(3) = The "Demographics" Row
+*/
+
+/* Pull the 3rd Row (Demographics) UP towards the 2nd Row */
+[data-testid="stVerticalBlock"] > [data-testid="stHorizontalBlock"]:nth-of-type(3) {
+    margin-top: var(--row-gap-adjustment) !important;
+    position: relative;
+    z-index: 5; /* Ensures it floats correctly if overlapping */
+}
+
+/* Optional: Pull the Footer (Error Box) UP */
+div.stAlert {
+    margin-top: -1rem !important;
+}
