@@ -754,10 +754,10 @@ else:
             p_22, p_17 = m_22['PA_Days'].mean(), m_17['PA_Days'].mean()
 
             # Fixed: Added :+.2f to force the + or - sign for CSS detection
-            kpi1.metric(label="🧠 Avg Loneliness", value=f"{l_22:.2f}", delta=f"{l_22 - l_17:+.2f} vs 2017", delta_color="inverse", help="Avg score (1-5). Higher = more isolated.")
-            kpi2.metric(label="⚠️ Suicidal Risk", value=f"{s_22:.1f}%", delta=f"{s_22 - s_17:+.1f}% vs 2017", delta_color="inverse", help="% of students reporting ideation.")
-            kpi3.metric(label="🏃 Physical Activity", value=f"{p_22:.1f}", delta=f"{p_22 - p_17:+.1f} vs 2017", delta_color="normal", help="Average days of exercise per week.")
-            kpi4.metric(label="📉 Depression Rate", value="26.9%", delta="+8.6% vs 2017", delta_color="inverse", help="Comparing NHMS 2022 to 2017 data.")
+            kpi1.metric(label="🧠 Avg Loneliness", value=f"{l_22:.2f}", delta=f"{l_22 - l_17:+.2f} vs 2017", delta_color="inverse", help="The average loneliness score: Higher score means the student feels more isolated.")
+            kpi2.metric(label="⚠️ Suicidal Risk", value=f"{s_22:.1f}%", delta=f"{s_22 - s_17:+.1f}% vs 2017", delta_color="inverse", help="Percentage of students who have reported suicidal thoughts.")
+            kpi3.metric(label="🏃 Physical Activity", value=f"{p_22:.1f}", delta=f"{p_22 - p_17:+.1f} vs 2017", delta_color="normal", help="The average number of days students exercise per week.")
+            kpi4.metric(label="📉 Depression Rate", value="26.9%", delta="+8.6% vs 2017", delta_color="inverse", help="Overall depression rate comparing NHMS 2022 to 2017 data.")
         else:
             kpi1.metric(label="🧠 Avg Loneliness", value=f"{current_lonely:.2f}", delta="Scale: 1-5", delta_color="off")
             kpi2.metric(label="⚠️ Suicidal Risk", value=f"{current_suicide:.1f}%", delta=f"{int(page1_df['MH_Suicidal_Flag'].sum())} Cases", delta_color="off")
@@ -786,7 +786,7 @@ else:
         # === CHART 1: ANXIETY & SLEEP ===
         with col_r1_1:
             with st.container(border=True):
-                st.markdown("#### 1. The Anxiety Shift", help="Correlation between worry-induced insomnia and bullying history.")
+                st.markdown("#### 1. Impact of Bullying on Sleep", help="Shows how the frequency of being bullied directly affects a student's sleep quality.")
                 
                 if not filtered_df.empty and 'VL_EverBullied' in filtered_df.columns:
                     # THE FIX: Add .query to remove the 'nan' string only for this chart
@@ -808,13 +808,13 @@ else:
                         hovertemplate="<b>%{x}</b><br>Bullied: %{y:.1f}%<extra></extra>",
                         hoverlabel=hover_style  # Applied style
                     )
-                    fig_anxiety.update_layout(xaxis_title=None, yaxis_title="% Bullied", coloraxis_showscale=False, height=150, margin=dict(l=0, r=0, t=0, b=0))
+                    fig_anxiety.update_layout(xaxis_title="Frequency of Losing Sleep", yaxis_title="% of Bullied", coloraxis_showscale=False, height=150, margin=dict(l=0, r=0, t=0, b=0))
                     st.plotly_chart(fig_anxiety, use_container_width=True)
 
-        # === CHART 2: COVID IMPACT ===
+        # === CHART 2 COVID IMPACT ===
         with col_r1_2:
             with st.container(border=True):
-                st.markdown("#### 2. Covid-19 Impact", help="Direct comparison of indicators before and after the pandemic.")
+                st.markdown("#### 2. Pre and Post Covid-19: Mental Health", help="Comparing the percentage of students facing loneliness and suicidal risk before and after the pandemic.")
                 years_present = filtered_df['Year'].unique()
                 
                 # SCORE MAPPING DEFINITION
@@ -828,10 +828,10 @@ else:
                     for y in [2017, 2022]:
                         d_y = filtered_df[filtered_df['Year'] == y].copy()
                         
-                        # FORCE CALCULATION: Create temp score on the fly
+                        # FORCE CALCULATION Create temp score on the fly
                         d_y['Temp_Score'] = d_y['MH_LonelyFrequency'].map(score_map).fillna(0)
                         
-                        # CALC: % with Score >= 4
+                        # CALC % with Score >= 4
                         l_pct = (d_y['Temp_Score'] >= 4).mean() * 100
                         s_pct = d_y['MH_Suicidal_Flag'].mean() * 100
                         
@@ -842,23 +842,23 @@ else:
                                     text_auto='.1f', color_discrete_map={"2017": "#7f8c8d", "2022": "#3498db"})
                     
                     fig_covid.update_traces(
-                        hovertemplate="Year: <b>%{fullData.name}</b><br>%{x}: <b>%{y:.1f}%</b><extra></extra>",
+                        hovertemplate="Year <b>%{fullData.name}</b><br>%{x} <b>%{y:.1f}%</b><extra></extra>",
                         hoverlabel=hover_style
                     )
-                    fig_covid.update_layout(yaxis_title="Prevalence (%)", xaxis_title=None, height=150, 
+                    fig_covid.update_layout(yaxis_title="% of Students", xaxis_title=None, height=150, 
                                             margin=dict(l=0, r=0, t=0, b=0), 
                                             legend=dict(orientation="v", yanchor="top", y=1, xanchor="left", x=1.02))
                     st.plotly_chart(fig_covid, use_container_width=True)
                 else:
                     st.info("Select 'Both' years in global filters to view comparison.")
 
-        # --- 4. ROW 2: DEMOGRAPHICS ---
-        col_r2_1, col_r2_2, col_r2_3 = st.columns([1.5, 1, 1.5])
+        # --- 4. ROW 2 DEMOGRAPHICS ---
+        col_r2_1, col_r2_2, col_r2_3 = st.columns([1.2, 1.1, 1.4])
 
-       # === CHART 3: AGE TREND (WITH PEAK HIGHLIGHT) ===
+       # === CHART 3 AGE TREND WITH PEAK HIGHLIGHT ===
         with col_r2_1:
             with st.container(border=True):
-                st.markdown("#### 3. Age Vulnerability", help="Comparing 2017 (Gray) vs 2022 (Red).")
+                st.markdown("#### 3. Peak Loneliness by Age", help="Tracking which specific age groups experience the highest levels of loneliness.")
                 if not page1_df.empty:
                     age_trend = page1_df.groupby(['Year', 'Age'])['MH_Loneliness_Score'].mean().reset_index()
                     
@@ -873,26 +873,25 @@ else:
                     )
 
                     # 1. ADD A CLEANER PEAK INDICATOR
-                    # Instead of a long text, we use a simple label right above the peak point
                     fig_line.add_annotation(
                         x=peak_age, y=peak_val,
-                        text=f"Peak: Age {peak_age:.0f}",
+                        text=f"Peak Age {peak_age:.0f}",
                         showarrow=True, arrowhead=1, arrowcolor="#9CA3AF",
-                        ax=0, ay=-25, # Positions text directly above the point
+                        ax=0, ay=-25, 
                         font=dict(color="white", size=10),
-                        bgcolor="rgba(31, 41, 55, 0.8)" # Dark background for readability
+                        bgcolor="rgba(31, 41, 55, 0.8)" 
                     )
 
                     fig_line.update_traces(
                         line_shape="spline", line_width=3,
                         marker=dict(size=8, line=dict(width=1, color="white")),
-                        hovertemplate="Year: <b>%{fullData.name}</b><br>Age: %{x}<br>Score: <b>%{y:.2f}</b><extra></extra>",
+                        hovertemplate="Year <b>%{fullData.name}</b><br>Age %{x}<br>Score <b>%{y:.2f}</b><extra></extra>",
                         hoverlabel=hover_style
                     )
 
-                    # 2. POSITION LEGEND TOP-LEFT TO AVOID CLUTTER
+                    # 2. POSITION LEGEND TOP LEFT TO AVOID CLUTTER
                     fig_line.update_layout(
-                        yaxis_title="Loneliness", 
+                        yaxis_title="Avg Loneliness Score", 
                         xaxis_title="Student Age",
                         xaxis=dict(tickmode='linear', dtick=1, gridcolor='rgba(255,255,255,0.05)'),
                         yaxis=dict(range=[1.5, 3.5], gridcolor='rgba(255,255,255,0.05)'), 
@@ -903,13 +902,13 @@ else:
                             yanchor="top",
                             y=0.98,
                             xanchor="left",
-                            x=0.02, # Moves legend to the left side
+                            x=0.02, 
                             font=dict(size=10),
                             title=None,
                             bgcolor="rgba(0,0,0,0)"
                         ),
                         
-                        height=150, 
+                        height=180, 
                         margin=dict(l=10, r=10, t=10, b=0),
                         paper_bgcolor='rgba(0,0,0,0)', 
                         plot_bgcolor='rgba(0,0,0,0)'
@@ -917,10 +916,10 @@ else:
                     
                     st.plotly_chart(fig_line, use_container_width=True)
 
-        # === CHART 4: PEER SUPPORT (ENHANCED) ===
+        # === CHART 4 PEER SUPPORT ENHANCED ===
         with col_r2_2:
             with st.container(border=True):
-                st.markdown("#### 4. Support System", help="Percentage of students feeling supported by peers.")
+                st.markdown("#### 4. Peer Support", help="Showing the exact percentage of adolescents who feel they have reliable friends to help them.")
                 if 'PF_HasPeerSupport' in filtered_df.columns:
                     val_peer = (filtered_df['PF_HasPeerSupport'].value_counts(normalize=True) * 100).get('Yes', 0)
                     donut_data = pd.DataFrame({"Status": ["Yes", "No"], "Percentage": [val_peer, 100-val_peer]})
@@ -931,16 +930,15 @@ else:
                         names="Status", 
                         hole=0.75, 
                         color="Status", 
-                        color_discrete_map={"Yes": "#00E676", "No": "#1F2937"}, # High-contrast Neon Green vs Deep Slate
+                        color_discrete_map={"Yes": "#00E676", "No": "#1F2937"}, 
                         category_orders={"Status": ["Yes", "No"]} 
                     )
                     
                     fig_donut.update_traces(
                         sort=False, 
                         textinfo='none', 
-                        # Add a subtle border to create a "ring" separation effect
                         marker=dict(line=dict(color='#000000', width=1)), 
-                        hovertemplate="Status: <b>%{label}</b><br>Proportion: <b>%{value:.1f}%</b><extra></extra>",
+                        hovertemplate="Status <b>%{label}</b><br>Proportion <b>%{value:.1f}%</b><extra></extra>",
                         hoverlabel=hover_style
                     )
                     
@@ -951,39 +949,38 @@ else:
                     )
 
                     fig_donut.update_layout(
-                        showlegend=False, height=150, 
+                        showlegend=False, height=180, 
                         margin=dict(l=15, r=15, t=0, b=0),
                         paper_bgcolor='rgba(0,0,0,0)',
                         plot_bgcolor='rgba(0,0,0,0)'
                     )
                     st.plotly_chart(fig_donut, use_container_width=True)
 
-        # === CHART 5: HOTSPOTS (CLEAN LOLLIPOP ALTERNATIVE) ===
+        # === CHART 5 HOTSPOTS CLEAN LOLLIPOP ALTERNATIVE ===
         with col_r2_3:
             with st.container(border=True):
                 # 1. Title with Help Icon restored
                 c1, c2 = st.columns([1.5, 1])
                 with c1: 
-                    st.markdown("#### 5. Priority Areas", help="The top 5 states requiring the most immediate mental health support.")
+                    st.markdown("#### 5. High Risk Areas", help="Ranking the specific Malaysian states with the most severe rates of loneliness suicidal risk or bullying.")
                 with c2: 
                     map_metric = st.selectbox("", ["Loneliness", "Suicide Risk", "Bullying"], 
                                             label_visibility="collapsed", key="map_sel_p1")
 
-                # 2. Data Logic & Dynamic Labeling
+                # 2. Data Logic and Dynamic Labeling
                 if map_metric == "Loneliness":
-                    caption = "States with highest % of clinical isolation (Score ≥ 4)"
-                    # NOW SAFE TO USE: MH_Loneliness_Score is fixed (Never=1, Always=5)
+                    caption = "States with the highest rates of severe loneliness"
                     state_data = filtered_df.groupby('State')['MH_Loneliness_Score'].apply(lambda x: (x >= 4).mean() * 100).reset_index(name='Val')
                     colors = "Reds"
                     
                 elif map_metric == "Suicide Risk":
-                    caption = "States with highest clinical risk flags"
+                    caption = "States with the highest suicide risk"
                     state_data = filtered_df.groupby('State')['MH_Suicidal_Flag'].mean().reset_index(name='Val')
                     state_data['Val'] *= 100
                     colors = "RdPu"
                     
                 else:
-                    caption = "States with highest victimization rates"
+                    caption = "States with the highest bullying rates"
                     state_data = filtered_df.groupby('State')['VL_EverBullied'].apply(lambda x: (x == 'Yes').mean() * 100).reset_index(name='Val')
                     colors = "YlOrBr"
 
@@ -1011,13 +1008,13 @@ else:
                     text=[f" <b>{v:.1f}%</b>" for v in state_data['Val']],
                     textposition="middle right",
                     textfont=dict(color="white", size=11),
-                    hovertemplate="<b>%{y}</b><br>Risk: <b>%{x:.2f}%</b><extra></extra>",
+                    hovertemplate="<b>%{y}</b><br>Risk <b>%{x:.2f}%</b><extra></extra>",
                     hoverlabel=hover_style
                 ))
 
                 fig_hot.update_layout(
-                    height=130, # Slightly shorter to pack it tighter
-                    margin=dict(l=10, r=80, t=0, b=0), # Removed top margin to pull chart UP
+                    height=161, 
+                    margin=dict(l=10, r=80, t=0, b=0), 
                     xaxis=dict(visible=False, range=[0, state_data['Val'].max() * 1.4]),
                     yaxis=dict(showgrid=False, tickfont=dict(size=11, color="white")),
                     paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
@@ -1026,7 +1023,7 @@ else:
                 
                 st.plotly_chart(fig_hot, use_container_width=True, config={'displayModeBar': False})
 
-        st.markdown("<br>", unsafe_allow_html=True) 
+        st.markdown("<br>", unsafe_allow_html=True)
 
         # ==========================================
         # FINAL SMART INSIGHT GROUP PROFILE
@@ -1240,45 +1237,56 @@ else:
             # --- 3. INSIGHT TEXT GENERATION ---
 
             # Insight 1: Sleep
-            # 1. Match the column name used in Chart 1
             sleep_col = 'MH_WorryNoSleepFrequency'
 
             if sleep_col in filtered_df.columns:
-                # --- THE FIX: Add .query to ignore the 'nan' string ---
-                # This prevents 'nan' from being chosen as the worst_group or best_group
-                valid_sleep_df = filtered_df[filtered_df[sleep_col] != 'nan']
+                # === THE NUCLEAR FIX ===
                 
-                # 1. Calculate Bullied % for each frequency group using the valid data
+                # 1. Create a temporary 'Cleaned' column
+                # This removes ALL spaces from start/end and fixes casing
+                # e.g., "  Unknown " becomes "Unknown"
+                temp_df = filtered_df.copy()
+                temp_df['Clean_Sleep'] = temp_df[sleep_col].astype(str).str.strip()
+
+                # 2. Define the exact valid list
+                valid_responses = ['Always', 'Most of the time', 'Sometimes', 'Rarely', 'Never']
+
+                # 3. Strict Filter: Only keep rows where the 'Clean_Sleep' is in our valid list
+                # This automatically drops "Unknown", "N/A", "nan", etc.
+                valid_sleep_df = temp_df[temp_df['Clean_Sleep'].isin(valid_responses)]
+
+                # 4. Calculate Stats using the CLEAN dataframe
+                # Note: We group by the ORIGINAL column name, but using the filtered rows
                 sleep_stats = valid_sleep_df.groupby(sleep_col)['VL_EverBullied'].apply(lambda x: (x == 'Yes').mean() * 100)
                 
                 if not sleep_stats.empty:
-                    # 2. Identify Worst (High Risk) and Best (Low Risk)
+                    # Identify Worst and Best
                     worst_group = sleep_stats.idxmax()
                     worst_val = sleep_stats.max()
                     
                     best_group = sleep_stats.idxmin()
                     best_val = sleep_stats.min()
 
-                    # 3. Smart Sentence Logic
-                    # Define indentation for the second line to keep it clean
+                    # Indentation style
                     indent_style_I1 = "display:inline-block; margin-left: 133px;"
 
-                    if best_val > 0.1 and worst_val != best_val:
-                        # Standard Comparison (Use this when both bars are visible)
+                    # LOGIC CHECK: If 'Unknown' somehow survived, force a skip
+                    if "Unknown" in str(worst_group) or "nan" in str(worst_group):
+                         insight_1 = "🌑 <b>Anxiety Data:</b> Data quality insufficient for insight."
+                    
+                    elif best_val > 0.1 and worst_val != best_val:
                         insight_1 = (
                             f"🌑 <b>Correlation Found:</b> Anxiety-induced sleep loss tracks with bullying.<br>"
                             f"<span style='{indent_style_I1}'>Students who <b>'{worst_group}'</b> lose sleep represent the highest risk group "
                             f"(<b>{worst_val:.1f}%</b> bullied), compared to {best_val:.1f}% for those who '{best_group}' lose sleep.</span>"
                         )
                     else:
-                        # Single Focus (Use this when the other group is 0%)
                         insight_1 = (
                             f"🌑 <b>Anxiety Link:</b> For this specific group, students who <b>'{worst_group}'</b> "
                             f"lose sleep from worry report the highest bullying rate at <b>{worst_val:.1f}%</b>."
                         )
-                
                 else:
-                    insight_1 = "🌑 <b>Anxiety Data:</b> Insufficient data."
+                    insight_1 = "🌑 <b>Anxiety Data:</b> Insufficient data for valid categories."
             else:
                 insight_1 = f"🌑 <b>Error:</b> Column '{sleep_col}' not found."
 
@@ -1333,14 +1341,29 @@ else:
             else:
                 insight_2 = f"📍 <b>Regional Insight:</b> {regional_sentence}"
 
-            # Insight 3: Age
+            # Insight 3: Age Vulnerability (MATCHED TO CHART 3)
             is_all_ages = 'Select All' in selected_ages or len(selected_ages) == df['Age'].nunique()
 
             if is_all_ages:
-                peak_age_current = filtered_df.groupby('Age')['MH_Loneliness_Score'].mean().idxmax()
-                peak_val_current = filtered_df.groupby('Age')['MH_Loneliness_Score'].mean().max()
-                insight_3 = f"👥 <b>Age Vulnerability:</b> Loneliness severity peaks at <b>{peak_age_current}</b> years old (Score: {peak_val_current:.2f}) for this group."
+                # 1. We must group by Year AND Age to match Chart 3's logic
+                # We focus on the most recent year in the current selection
+                latest_yr = filtered_df['Year'].max()
+                age_stats = filtered_df[filtered_df['Year'] == latest_yr].groupby('Age')['MH_Loneliness_Score'].mean()
+                
+                if not age_stats.empty:
+                    # 2. Find the peak age and value
+                    peak_age_raw = age_stats.idxmax()
+                    peak_score_val = age_stats.max()
+                    
+                    # 3. Clean format (remove .0)
+                    peak_age_final = int(float(peak_age_raw)) 
+
+                    insight_3 = f"👥 <b>Age Vulnerability:</b> Loneliness severity peaks at <b>{peak_age_final} years old</b> (Avg Score: {peak_score_val:.2f}) for the {latest_yr} cohort."
+                else:
+                    insight_3 = "👥 <b>Age Vulnerability:</b> No data available for peak analysis."
+            
             else:
+                # Individual age selection logic
                 group_score_age = filtered_df['MH_Loneliness_Score'].mean()
                 diff_age = group_score_age - nat_avg_L
                 status_age = "more vulnerable" if diff_age > 0 else "more resilient"
@@ -1528,12 +1551,23 @@ else:
         # --- Quadrant 1: Peer Support ---
         with row1_1:
             with st.container(border=True, height=BOX_HEIGHT):
-                st.markdown("#### 1. Peer Support Effect", help="Shows the distribution of loneliness risk levels based on whether students have peer support.")
+                st.markdown("#### 1. Peer Support Impact ", help="Shows how loneliness risk levels change based on whether a student has a friend network.")
+                
                 if not exp_df.empty:
+                    # 1. Define Risk Categories (Same as before)
                     exp_df['Risk_Category'] = pd.cut(exp_df['MH_Loneliness_Score'], bins=[0, 2.5, 3.5, 6.0], labels=['Healthy', 'Moderate', 'Critical'])
+                    
+                    # 2. Group the data
                     bar_data = exp_df.groupby(['PF_HasPeerSupport', 'Risk_Category'], observed=False).size().reset_index(name='Count')
+                    
+                    # --- NEW LINE: Filter out 'Unknown' specifically for this chart ---
+                    # This removes the bar from the chart, but keeps the 10,000 count in the background memory
+                    bar_data = bar_data[bar_data['PF_HasPeerSupport'] != 'Unknown']
+                    
+                    # 3. Calculate Percentages (The math works correctly for the remaining groups)
                     bar_data['Percentage'] = bar_data.groupby('PF_HasPeerSupport')['Count'].transform(lambda x: 100 * x / x.sum())
                     
+                    # 4. Plot
                     fig1 = px.bar(bar_data, x="Percentage", y="PF_HasPeerSupport", color="Risk_Category", orientation='h',
                                      color_discrete_map={'Healthy': '#2ecc71', 'Moderate': '#f1c40f', 'Critical': '#e74c3c'}, text_auto='.0f')
                     
@@ -1545,7 +1579,7 @@ else:
                         hoverlabel=hover_style,
                         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, title=None),
                         xaxis_title="% of Students",
-                        yaxis_title="Peer Support"
+                        yaxis_title="Have Peer Support?"
                     )
                     st.plotly_chart(fig1, use_container_width=True)
 
@@ -1553,7 +1587,7 @@ else:
         heatmap_data = pd.DataFrame()
         with row1_2:
             with st.container(border=True, height=BOX_HEIGHT):
-                st.markdown("#### 2. Demographic Risk Matrix", help="Visualizes average loneliness scores across different family and ethnic backgrounds. Darker colors indicate higher reported loneliness (Higher Risk).")
+                st.markdown("#### 2. Parental Status and Ethnicity Matrix", help="Darker colors indicate higher average loneliness scores for specific family and ethnic backgrounds.")
                 if not exp_df.empty:
                     h_df = exp_df[~exp_df['Ethnicity'].str.contains('Others|Unknown', case=False, na=False)]
                     h_df = h_df[~h_df['ParentsStatus_Clean'].str.contains('Others|Unknown', case=False, na=False)]
@@ -1568,7 +1602,7 @@ else:
                         height=CHART_HEIGHT, 
                         hoverlabel=hover_style,
                         coloraxis_showscale=True, 
-                        yaxis_title=None
+                        yaxis_title="Parental Status"
                     )
                     st.plotly_chart(fig2, use_container_width=True)
 
@@ -1577,7 +1611,7 @@ else:
         # --- Quadrant 3: Activity Buffer ---
         with row2_1:
             with st.container(border=True, height=BOX_HEIGHT): 
-                st.markdown("#### 3. Activity Buffer", help="Compares the average loneliness scores between active and inactive students to see if physical activity acts as a protective factor.")
+                st.markdown("#### 3. Exercise Buffer", help="Compares the average loneliness scores between active and inactive students to see if physical activity acts as a protective factor.")
                 pa_col = next((c for c in exp_df.columns if c in ['PA_TotalDays', 'PA_Days']), 'PA_TotalDays')
                 if not exp_df.empty and pa_col in exp_df.columns:
                     exp_df['Activity_Level'] = pd.cut(exp_df[pa_col], bins=[-1, 2, 8], labels=['Inactive (0-2 days)', 'Active (3+ days)'])
@@ -1592,7 +1626,7 @@ else:
                         height=CHART_HEIGHT, 
                         hoverlabel=hover_style,
                         showlegend=False,
-                        xaxis_title="Physical Activity Level",
+                        xaxis_title="Weekly Physical Activity",
                         yaxis_title="Avg Loneliness Score"
                     )
                     st.plotly_chart(fig3, use_container_width=True)
@@ -1621,9 +1655,9 @@ else:
                 chart_limit = min(global_max + 12, 100)
 
                 theme = st.selectbox(
-                    "Compare Factors:", 
+                    "Compare Behavioral Risks:", 
                     list(theme_map.keys()),
-                    help="Shows the prevalence of behaviors. The X-axis is fixed to the highest risk in this segment for consistency."
+                    help="Ranks the most common lifestyle or safety issues reported by this specific group of students."
                 )
                 
                 cols, plot_data = theme_map[theme], []
@@ -2300,9 +2334,9 @@ else:
                 with c2:
                     st.info("⚠️ **2.7x Risk Multiplier**\n\nVaping captures the widest range of students who may be starting to develop risks.")
 
-# -----------------------------------------------------------------------------
-# PAGE 4: Insights & Recommendations (Corrected & Aesthetically Pleasing)
-# -----------------------------------------------------------------------------
+# -------------------------------------
+# PAGE 4: Insights & Recommendations
+# -------------------------------------
 
     elif page == "💡 Insights & Recommendation": 
         
@@ -2368,17 +2402,17 @@ else:
                 
             return 0.5
 
-        factor_map = {
-            'SMK_CurrentlySmokeVape': 'Currently Vaping/Smoking',
-            'SMK_AgeFirstVaping': 'Early Vaping Initiation',
-            'MH_CloseFriendsCount': 'Social Support (Friends)',
-            'OH_HandwashBeforeEating': 'Hygiene Habits',
-            'DIET_VegeIntakePerDay': 'Nutrition (Vegetables) Intake',
-            'SMK_UseCigar': 'Cigar Use',
-            'SMK_UseSnuff': 'Snuff Use',
-            'IA_SourceFriends': 'Peer Online Influence',
-            'DRUG_SourceDrug': 'Access to Drugs'
-        }
+        category_map = {
+                'DIET_VegeIntakePerDay': ('Vegetable Intake', 'Diet'),
+                'OH_HandwashBeforeEating': ('Handwash Frequency', 'Hygiene'),
+                'MH_CloseFriendsCount': ('Peer Support', 'Social and Connectivity'),
+                'IA_SourceFriends': ('Peer Online Influence', 'Social and Connectivity'),
+                'SMK_UseCigar': ('Cigar Use', 'Substance Use'),
+                'SMK_UseSnuff': ('Snuff Use', 'Substance Use'),
+                'SMK_AgeFirstVaping': ('Early Vaping Age', 'Substance Use'),
+                'SMK_CurrentlySmokeVape': ('Currently Vaping or Smoking', 'Substance Use'),
+                'DRUG_SourceDrug': ('Access to Drugs', 'Substance Use')
+            }
 
         # Prepare Target
         if not df_final.empty:
@@ -2389,16 +2423,16 @@ else:
                 df_final['Target_Score'] = 1 # Fallback
 
             strength_list = []
-            for col, label in factor_map.items():
+            for col, (label,category) in category_map.items():
                 if col in df_final.columns:
                     temp_df = df_final[[col, 'Target_Score']].dropna().copy()
                     temp_df['Numeric_Col'] = temp_df[col].apply(smart_convert)
                     r = abs(temp_df['Numeric_Col'].corr(temp_df['Target_Score']))
-                    strength_list.append({'Factor': label, 'Strength': r, 'ID': col})
+                    strength_list.append({'Factor': label, 'Category': category, 'Strength': r, 'ID': col})
 
-            strength_df = pd.DataFrame(strength_list).sort_values('Strength', ascending=False)
+            strength_df = pd.DataFrame(strength_list).sort_values(['Category', 'Strength'], ascending=[True, True])
         else:
-            strength_df = pd.DataFrame(columns=['Factor', 'Strength'])
+            strength_df = pd.DataFrame(columns=['Factor', 'Category', 'Strength'])
 
         # =========================================================================
         # PART 1: CHART
@@ -2406,28 +2440,45 @@ else:
         if not strength_df.empty:
             c_chart, c_facts = st.columns([2.5, 1])
             
-            # --- LEFT: CHART ---
+            # --- LEFT CHART ---
             with c_chart:
                 st.markdown("##### 📈 Which behaviors affect risk the most?")
-                fig_predictive = px.bar(strength_df.sort_values('Strength'), x='Strength', y='Factor', 
-                                    orientation='h', color_discrete_sequence=['#636EFA'], text_auto='.2f')
-                fig_predictive.update_layout(height=350, margin=dict(l=10, r=10, t=10, b=10),
-                                            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-                                            xaxis_title="Influence Score (0-1)", yaxis_title=None)
+                
+                # THE FIX Use Factor for Y and lock the order so the categories stay clustered
+                fig_predictive = px.bar(
+                    strength_df, 
+                    x='Strength', 
+                    y='Factor', 
+                    orientation='h', 
+                    color='Category', 
+                    text_auto='.2f',
+                    category_orders={"Factor": strength_df['Factor'].tolist()}
+                )
+                
+                fig_predictive.update_layout(
+                    height=400, 
+                    margin=dict(l=10, r=10, t=10, b=10),
+                    paper_bgcolor="rgba(0,0,0,0)", 
+                    plot_bgcolor="rgba(0,0,0,0)",
+                    xaxis_title="Influence Score 0 to 1", 
+                    yaxis_title=None,
+                    legend_title="Risk Category"
+                )
                 st.plotly_chart(fig_predictive, use_container_width=True)
 
-            # --- RIGHT: TOP FACTOR BOX ---
+            # --- RIGHT TOP FACTOR BOX ---
             with c_facts:
                 st.markdown("##### 🧐 Top Warning Sign")
-                top_f = strength_df.iloc[0]
                 
-                # Simplified language in HTML box
+                # Sort to ensure we always grab the absolute highest factor
+                top_f = strength_df.sort_values('Strength', ascending=False).iloc[0]
+                
                 st.markdown(f"""
                     <div style="padding:15px; border:1px solid rgba(128,128,128,0.2); border-radius:10px; background:rgba(99,110,250,0.05);">
                         <p style='font-size: 0.8em; opacity: 0.8;'>Strongest Risk Indicator</p>
                         <h3 style='color: #636EFA; margin:0;'>{top_f['Factor']}</h3>
                         <p style='font-size: 0.85em; margin-top:10px; line-height:1.4;'>
-                            Based on current data, this behavior has the <b>highest connection</b> to High Risk levels.
+                            Based on current data this behavior has the <b>highest connection</b> to High Risk levels
                         </p>
                     </div>
                 """, unsafe_allow_html=True)
