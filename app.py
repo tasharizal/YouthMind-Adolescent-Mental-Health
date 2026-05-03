@@ -2088,6 +2088,7 @@ else:
             # ---------------------------------------------------------
             pdf = FPDF()
             pdf.add_page()
+            pdf.set_margins(10, 10, 10) # Left, Top, Right margins in mm
             
             # Header
             pdf.set_font("Arial", 'B', 16)
@@ -2101,7 +2102,7 @@ else:
             pdf.cell(0, 8, "1. Triage & Stratification Summary", ln=True)
             pdf.set_font("Arial", '', 11)
             pdf.cell(0, 6, f"Calculated Stratum: {st.session_state.pred}", ln=True)
-            pdf.multi_cell(0, 6, f"Clinical Recommendation: {st.session_state.action}")
+            pdf.multi_cell(190, 6, f"Clinical Recommendation: {st.session_state.action}")
             pdf.ln(5)
             
             # The Patient's Answers Table
@@ -2123,8 +2124,12 @@ else:
             pdf.set_font("Arial", 'B', 12)
             pdf.cell(0, 8, "3. Probabilistic Risk Drivers (XAI)", ln=True)
             pdf.set_font("Arial", '', 10)
+
             for item in st.session_state.evidence:
-                pdf.multi_cell(0, 6, f"- {item}")
+            if item and str(item).strip():  # Only print if item is not empty
+                pdf.set_x(10)               # Force cursor back to left margin (10mm)
+                pdf.multi_cell(190, 6, f"- {item}") # Use 190 instead of 0 for fixed width
+            
             pdf.ln(10)
             
             # Disclaimer
