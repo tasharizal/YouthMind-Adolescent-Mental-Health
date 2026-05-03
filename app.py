@@ -2126,9 +2126,9 @@ else:
             pdf.set_font("Arial", '', 10)
 
             for item in st.session_state.evidence:
-            if item and str(item).strip():  # Only print if item is not empty
-                pdf.set_x(10)               # Force cursor back to left margin (10mm)
-                pdf.multi_cell(190, 6, f"- {item}") # Use 190 instead of 0 for fixed width
+                if item and str(item).strip():  # Only print if item is not empty
+                    pdf.set_x(10)               # Force cursor back to left margin (10mm)
+                    pdf.multi_cell(190, 6, f"- {item}") # Use 190 instead of 0 for fixed width
             
             pdf.ln(10)
             
