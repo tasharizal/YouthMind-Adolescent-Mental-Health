@@ -8,6 +8,7 @@ import os
 import textwrap
 import re
 import time
+from fpdf import FPDF
 
 # -----------------------------------------------------------------------------
 # 0. PAGE CONFIGURATION & THEME SETUP
