@@ -7,6 +7,7 @@ import base64
 import os
 import textwrap
 import re
+import time
 
 # -----------------------------------------------------------------------------
 # 0. PAGE CONFIGURATION & THEME SETUP
@@ -567,10 +568,10 @@ else:
 
         # 1. DEFINE OPTIONS (Must be a fixed list)
         nav_options = [
-            "🏠 Overview & Trends",
-            "📊 Interactive Analysis",
-            "🔮 Risk Assessment Predictor",
-            "💡 Insights & Recommendation"
+            "Overview & Trends",
+            "Interactive Analysis",
+            "Risk Assessment Predictor",
+            "Insights & Recommendation"
         ]
 
         # 2. INITIALIZE MEMORY (If it doesn't exist, start at Home)
@@ -729,7 +730,7 @@ else:
 # -----------------------------------------------------------------------------
 # PAGE 1: Overview & Trends
 # -----------------------------------------------------------------------------
-    if page == "🏠 Overview & Trends":
+    if page == "Overview & Trends":
         
         page1_df = filtered_df 
 
@@ -1402,7 +1403,7 @@ else:
 # -----------------------------------------------------------------------------
 # PAGE 2: Interactive Exploration (Clean & Aligned)
 # -----------------------------------------------------------------------------
-    elif page == "📊 Interactive Analysis":
+    elif page == "Interactive Analysis":
         
         # --- 1. CSS STYLING (For the visual boxes) ---
         st.markdown("""
@@ -1934,422 +1935,348 @@ else:
             """, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# PAGE 3: AI Risk Prediction (WEKA Model)
+# PAGE 3: Risk Assessment (Bayes Net Model)
 # -----------------------------------------------------------------------------
-    elif page == "🔮 Risk Assessment Predictor":
+    elif page == "Risk Assessment Predictor":
+        import time
+        import base64
+        import streamlit.components.v1 as components
+        from datetime import datetime
         
-        # --- CUSTOM CSS FOR FUTURISTIC LOOK ---
-        st.markdown("""
-        <style>
-        .stApp { background-color: #0e1117; } /* Optional: Force dark theme vibe */
-        
-        .custom-info-box {
-            background: rgba(0, 180, 216, 0.1); /* Subtle transparent blue */
-            border-left: 5px solid #00b4d8;     /* Cyan accent bar on left */
-            color: #caf0f8;                     /* Light icy text */
-            
-            padding: 5px;                      /* Comfortable spacing */
-            margin-bottom: 25px;                /* Space below */
-            margin-top: 0px;
-            
-            border-radius: 4px;                 /* Slight rounding */
-            font-size: 15px;
-            font-weight: 500;
-            width: 100%;                        /* Full width alignment */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle depth shadow */
-        }
-        .info-icon {
-            font-size: 20px;
-            margin-right: 10px;
-        }
-        
-        .futuristic-card {
-            background-color: #1e2130;
-            border: 1px solid #343a40;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            margin-bottom: 20px;
-        }
-        .result-box {
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            margin-top: 15px;
-            animation: fadeIn 1s;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        </style>
-        """, unsafe_allow_html=True)
-
-        # --- MAIN HEADER WITH HELP BUTTON ---
-        col_header, col_help = st.columns([0.5, 0.1])
-        with col_header:
-            st.title("🤖 AI Risk Prediction Model")
-            st.caption("Powered by YouthMind Champion Model (Wrapper J48 + BestFirst)")
-        with col_help:
-            # The Help Button (Popover)
-            with st.popover("ℹ️ How it works"):
-                st.markdown("""
-                <div style="font-size: 13px; line-height: 1.4;">
-                    <h3 style="font-size: 16px; margin-top: -18px; margin-bottom: -5px;">🧠 About the Logic</h3>                    
-                    This system uses the <b>Champion Naïve Bayes Model</b> (Score: 0.799) , <br>validated via <b>10-Fold Cross-Validation</b> to ensure reliability.
-                    <br><br>
-                    It calculates risk using <b>4 Key Behavioral Multipliers</b> identified in the Lift Analysis:
-                    <ul style="margin-top: 4px;">
-                        <li>🚨 <b>Stealing Drugs:</b> The definitive "Red Flag" (<b>12.7x</b> higher risk than average).</li>
-                        <li>🧼 <b>Poor Hygiene:</b> A silent sign of depressive apathy (<b>4.6x</b> higher risk).</li>
-                        <li>🤝 <b>Isolation (0 Friends):</b> Lack of a safety net (<b>3.9x</b> higher risk).</li>
-                        <li>💨 <b>Vaping:</b> The most common "Broad Spectrum" warning (<b>2.7x</b> higher risk).</li>
-                    </ul>
-                    <i>The model calculates a cumulative score based on these multipliers to determine Low, Moderate, or High status.</i>
-                    <br><br>
-                    <hr style="margin: -9px 0;">
-                    <h3 style="font-size: 16px; margin-top: 5px; margin-bottom: 5px;">⚠️ Dataset Integrity Note</h3>
-                    <b>Why 2017 Data Only?</b><br>
-                    This model strictly uses the <b>2017 Baseline Dataset</b>.
-                    <br><br>
-                    The 2022 dataset was excluded during validation due to <b>"Structural Feature Mismatch"</b>, it lacked the critical <i>Internet Addiction</i> variable required by the Champion Model. We prioritized statistical validity over data volume.
-                </div>
-                """, unsafe_allow_html=True)
-
-        # --- LOAD DATA (Hidden for logic) ---
+        # Verify FPDF is installed
         try:
-            # Check path: if your app.py is in the root, and csv is in 'data' folder
-            # Adjust "data/" if necessary.
-            df_risk = pd.read_csv("data/YouthMind_Dashboard_RiskPrediction.csv")
-        except FileNotFoundError:
-            st.error("⚠️ Data file not found. Please check your folder structure.")
+            from fpdf import FPDF
+        except ImportError:
+            st.error("⚠️ FPDF library is missing. Please run `pip install fpdf` in your terminal.")
             st.stop()
 
-        # --- THE "FUTURISTIC BOX" CONTAINER ---
-        with st.container(border=True):
-            st.subheader("📋 Student Screening Form")
+        if "show_results" not in st.session_state:
+            st.session_state.show_results = False
+
+        # ==========================================
+        # VIEW 1: THE INTAKE FORM (Questionnaire)
+        # ==========================================
+        if not st.session_state.show_results:
             
-            # --- THE ADJUSTABLE INFO BOX ---
-            col_box, _ = st.columns([1.0, 0.01]) 
-            with col_box:
+            st.title("Student Risk Assessment Tool")
+            st.caption("Decision Support System | Bayesian Network Inference Engine")
+            
+            with st.expander("Clinical Implementation Guide", expanded=False):
                 st.markdown("""
-                <div class="custom-info-box">
-                    <span class="info-icon"></span>
-                    Enter behaviors to calculate the Risk Score based on Naïve Bayes Probabilities.
-                </div>
-                """, unsafe_allow_html=True)
-            
-            # Compact 3-Column Layout
-            c1, c2 = st.columns(2)
-            c3, c4 = st.columns(2)
-            
-            with c1:
-                # Primary Indicator
-                drug_source = st.selectbox(
-                    "💊 Drug Acquisition Method", 
-                    [
-                        "None / Not Applicable", 
-                        "Given by friend", 
-                        "Bought", 
-                        "Stealing", 
-                        "Given by family",             
-                        "Gave someone else money",     
-                        "Unknown / Prefer not to say", 
-                        "Other"
-                    ],
-                    index=None, 
-                    placeholder="Select...", 
-                    help="How does the student obtain substances? (Variable: DRUG_SourceDrug)"
-                )
-            with c2:
-                # Broad-Spectrum Indicator
-                vaping = st.selectbox(
-                    "💨 Currently Vaping?", 
-                    ["No", "Yes", "Unknown"],
-                    index=None, 
-                    placeholder="Select...",  
-                    help="Does the student currently use vape? (Variable: SMK_CurrentlySmokeVape)"
-                )
-            with c3:
-                # Tertiary Indicator
-                friends = st.selectbox(
-                    "🤝 Close Friends Count", 
-                    ["3 or more", "2", "1", "0","Unknown"], 
-                    index=None, 
-                    placeholder="Select...", 
-                    help="How many close friends does the student have? (Variable: MH_CloseFriendsCount)"
-                )
-            with c4:
-                # Secondary Indicator
-                hygiene = st.selectbox(
-                    "🧼 Handwashing (Before Eating)", 
-                    ["Always", "Often", "Sometimes", "Rarely", "Never"],
-                    index=None, 
-                    placeholder="Select...",  
-                    help="Does the student wash their hands before eating? (Variable: OH_HandwashBeforeEating)"
-                )
-
-            # Run Button
-            if st.button("🚀 Analyze Risk Profile", type="primary", use_container_width=True):
+                **Model Overview:** This tool evaluates behavioral proxies using the validated 12-Attribute Bayes Net framework. 
                 
-                # --- 1. INPUT VALIDATION (Prevents False "Low Risk") ---
-                # Check if all inputs are None (empty)
-                if drug_source is None and hygiene is None and friends is None and vaping is None:
-                    st.markdown("""
-                    <div style="
-                        background-color: rgba(255, 193, 7, 0.15);
-                        border: 1px solid #ffc107;
-                        border-radius: 4px;
-                        padding: 15px;
-                        color: #ffc107;
-                        max-width: 700px;
-                        margin: 20px auto;
-                        text-align: left;
-                    ">
-                        ⚠️ <b>Input Required:</b> Please select at least one behavioral indicator to generate a risk assessment.
-                    </div>
-                    """, unsafe_allow_html=True)
-                    st.stop()
+                **Included Predictors:**
+                * **Mental Health:** Loneliness, Sleep Worry
+                * **Lifestyle/Diet:** Hunger, Sedentary Hours, Dental Care
+                * **Substance Use:** Alcohol Source, Drug Source, Meth Use, Vaping
+                * **Trauma/Risk:** Physical Attack, Verbal Abuse, Birth Control Use
+                """)
 
-                # --- 2. NAIVE BAYES LOGIC (Your existing code follows below) ---
-                risk_score = 0
-                evidence = []
+            with st.container(border=True):
+                st.markdown("#### Patient Behavioral Intake Questionnaire")
+                st.markdown("<p style='color: #666; font-size: 14px;'>Please answer all 12 questions based on the clinical interview or student self-report.</p>", unsafe_allow_html=True)
+                st.divider()
 
-                # Count how many fields were actually answered
-                inputs_filled = sum(x is not None for x in [drug_source, hygiene, friends, vaping])
-                
-                # 1. PRIMARY: Drug Source (12.7x)
-                if drug_source == "Stealing":
-                    risk_score += 80
-                    # Safe Phrasing: Focus on the "Model" and "Data", not the "Patient"
-                    evidence.append("🚨 <b>Stealing Behavior (12.7x):</b> 'Stealing' is the strongest statistical predictor of high risk in the dataset.")
-                elif drug_source in ["Given by friend", "Bought", "Given by family", "Gave someone else money"]:
-                    risk_score += 15
-                    evidence.append(f"⚠️ <b>Access Method:</b> Obtaining substances via '{drug_source}' increases the calculated risk score.")
-                elif drug_source == "Unknown / Prefer not to say":
-                     evidence.append("❓ <b>Missing Data:</b> Drug acquisition method unknown.")
-
-                # 2. SECONDARY: Hygiene (4.6x)
-                if hygiene == "Never":
-                    risk_score += 30
-                    evidence.append("🚩 <b>Severe Self-Neglect (4.6x):</b> 'Never' washing hands correlates strongly with higher risk profiles.")
-                elif hygiene == "Rarely":
-                    risk_score += 15
-                    evidence.append("⚠️ <b>Hygiene Concern:</b> Inconsistent habits detected.")
-                
-                # 3. TERTIARY: Social (3.9x)
-                if friends == "0":
-                    risk_score += 25
-                    evidence.append("🚩 <b>Social Factor (3.9x):</b> '0 Close Friends' indicates a lack of support network.")
-                elif friends == "1":
-                    risk_score += 10
-                    evidence.append("⚠️ <b>Limited Support:</b> Student reports only a single connection.")
-
-                # 4. BROAD-SPECTRUM: Vaping (2.7x)
-                if vaping == "Yes":
-                    risk_score += 20
-                    evidence.append("⚠️ <b>Vaping Status (2.7x):</b> Active vaping is a common trait found in the high-risk baseline group.")
-
-                # --- DATA CONFIDENCE CHECK (New Feature) ---
-                # If they answered fewer than 3 questions, add a warning note.
-                if inputs_filled < 3:
-                    evidence.append("📉 <b>Low Data Confidence:</b> Assessment based on partial data. Results may be inconclusive without more inputs.")
-                
-                # --- DETERMINE OUTCOME ---
-                if risk_score >= 50:
-                    pred = "HIGH RISK"
-                    bg_color = "rgba(255, 75, 75, 0.15)" 
-                    border_color = "#ff4b4b"             
-                    icon = "🚨"
-                    action = "Refer to Counselor for Review" # Safer than "Immediate Intervention"
-                elif risk_score >= 20:
-                    pred = "MODERATE RISK"
-                    bg_color = "rgba(255, 165, 0, 0.15)" 
-                    border_color = "#ffa500"             
-                    icon = "⚠️"
-                    action = "Monitor & Check-in"
-                else:
-                    pred = "LOW RISK"
-                    bg_color = "rgba(9, 171, 59, 0.15)"  
-                    border_color = "#09ab3b"             
-                    icon = "✅"
-                    action = "Standard Support"
-
-                # If NO risk behaviors were found (and data is sufficient)
-                if not evidence and inputs_filled >= 3:
-                    evidence.append("✅ **No Flags:** No specific risk behaviors identified.")
-                # If NO risk behaviors were found but data is scarce
-                elif not evidence and inputs_filled < 3:
-                    evidence.append("✅ **No Flags (Partial):** No risks identified yet, but data is limited.")
-
-                # --- 1. DISPLAY STATUS CARD ---
-                st.markdown(f"""
-                <div style="background-color: {bg_color}; border: 2px solid {border_color}; border-radius: 10px; padding: 15px; text-align: center; margin-top: 10px; margin-bottom: 20px;">
-                    <h1 style="color: {border_color}; margin: 0; font-size: 32px;">{icon} {pred}</h1>
-                    <p style="font-size: 18px; margin-top: 5px; font-weight: bold; color: #ffffff;">Suggested Action: {action}</p>
-                </div>
-                """, unsafe_allow_html=True)
-
-                # --- 2. DISPLAY KEY RISK DRIVERS ---
-                c_title, c_help = st.columns([0.75, 0.25])
-                
-                with c_title:
-                    st.markdown("### 📋 Identified Risk Factors")
-                
-                with c_help:
-                    # This creates the clickable "Icon Guide" button next to the title
-                    with st.popover("ℹ️ Icon Guide", use_container_width=True):
-                        st.markdown("""
-                        <div style="font-size: 14px; color: #cbd5e1; line-height: 1.6;">
-                            <ul style="list-style-type: none; padding-left: 0;">
-                                <li style="margin-bottom: 10px;">🚨 <b>Critical Indicator:</b> Strongest statistical driver (Highest Weight).</li>
-                                <li style="margin-bottom: 10px;">🚩 <b>High Impact Factor:</b> Significantly increases risk score.</li>
-                                <li style="margin-bottom: 10px;">⚠️ <b>Behavioral Factor:</b> Contributes to risk but carries lower weight.</li>
-                                <li style="margin-bottom: 10px;">✅ <b>No Flags:</b> No risk inputs detected.</li>
-                                <li style="margin-bottom: 10px;">📉 <b>Low Data Confidence:</b> Assessment based on partial data (< 3 inputs).</li>
-                                <li style="margin-bottom: 0px;">❓ <b>Missing Data:</b> Variable was skipped/unknown.</li>
-                            </ul>
-                        </div>
-                        """, unsafe_allow_html=True)
-                
-                # --- 3. THE LIST (Clean & Simple) ---
-                with st.container(border=True):
-                    for r in evidence:
-                        st.markdown(f"<div style='margin-bottom: 12px; font-size: 15px;'>{r}</div>", unsafe_allow_html=True)
-
-        # --- 4. THE EVIDENCE (Improved Visuals) ---
-        with st.expander("📊 View Data Evidence (Risk Drivers)", expanded=False):
-            
-            # --- HEADER & GUIDE BUTTON (Vertically Aligned) ---
-            # We add vertical_alignment="center" so the title and button align perfectly
-            c_header, c_guide = st.columns([0.75, 0.25], vertical_alignment="center")
-            
-            with c_header:
-                # Using HTML margin adjustments to ensure tight spacing with the caption
-                st.markdown('<h3 style="margin-bottom: 10px;">📉 Risk Distribution Analysis</h3>', unsafe_allow_html=True)
-                st.caption("Visualizing the likelihood of 'High Risk' across different student behaviors.")
-            
-            with c_guide:
-                # The "Chart Guide" Popover
-                with st.popover("ℹ️ Chart Guide", use_container_width=True):
-                    st.markdown("""
-                    <div style="font-size: 14px; color: #cbd5e1; line-height: 1.6;">
-                        <p style="margin-bottom: 10px;">
-                            These charts visualize the <b>Likelihood of High Risk</b> for different student groups.
-                        </p>
-                        <ul style="list-style-type: none; padding-left: 0;">
-                            <li style="margin-bottom: 10px;">🔴 <b>Red Bars (High Risk):</b> The primary sorting factor.</li>
-                            <li style="margin-bottom: 10px;">🟠 <b>Orange Bars (Medium Risk):</b> Moderate likelihood.</li>
-                            <li style="margin-bottom: 10px;">🟢 <b>Green Bars (Low Risk):</b> Protective or low-risk groups.</li>
-                        </ul>
-                        <hr style="margin: 10px 0; border-color: #343a40;">
-                        <p style="margin-bottom: 0;">
-                            <b>📉 Sorting Logic:</b> Categories are sorted from <b>Lowest Risk (Left)</b> to <b>Highest Risk (Right)</b> based on the size of the Red Bar.
-                        </p>
-                    </div>
-                    """, unsafe_allow_html=True)
-
-            import altair as alt
-
-            # --- AESTHETIC CHART FUNCTION ---
-            def create_modern_chart(data, x_col, x_title):
-                if x_col not in data.columns:
-                    return None
+                # --- Section 1: Mental Health & Lifestyle ---
+                st.markdown("##### 🧠 Mental Health & Lifestyle")
+                c1, c2 = st.columns(2)
+                with c1:
+                    lonely = st.selectbox("1. How often has the student felt lonely recently?", 
+                                         ["Never", "Rarely", "Sometimes", "Most of the time", "Always"], 
+                                         index=None, placeholder="Select frequency...")
                     
-                clean_data = data.copy()
-                # Clean up labels to remove quotes if necessary
-                clean_data[x_col] = clean_data[x_col].astype(str).str.replace("'", "", regex=False)
+                    sleep = st.selectbox("2. Does the student lose sleep because of worry?", 
+                                        ["Never", "Rarely", "Sometimes", "Most of the time", "Always"], 
+                                        index=None, placeholder="Select frequency...")
+                    
+                    dental = st.selectbox("3. When was the student's last dental visit?", 
+                                         ["Past 12 months", "12-24 months ago", "More than 24 months ago", "Never", "Do not know"], 
+                                         index=None, placeholder="Select timeframe...")
+                with c2:
+                    diet = st.selectbox("4. How often is the student hungry (not enough food)?", 
+                                       ["Never", "Rarely", "Sometimes", "Most of the time", "Always"], 
+                                       index=None, placeholder="Select frequency...")
+                    
+                    sitting = st.selectbox("5. Average hours spent sitting/sedentary per day?", 
+                                          ["Less than 1", "1 to 2", "3 to 4", "5 to 6", "7 to 8", "More than 8"], 
+                                          index=None, placeholder="Select hours...")
 
-                # --- 1. CALCULATE SORT ORDER (Lowest Risk % -> Highest Risk %) ---
-                # We calculate the percentage of 'High' risk for each category
-                risk_summary = clean_data.groupby(x_col)['Risk_Level'].apply(
-                    lambda x: (x == 'High').mean()
-                ).reset_index(name='High_Risk_Pct')
-                
-                # Sort the categories by this percentage (Ascending = Low to High)
-                sort_order = risk_summary.sort_values('High_Risk_Pct', ascending=True)[x_col].tolist()
+                st.write("") 
 
-                # --- 2. DEFINE COLORS (MATCHING YOUR DATASET) ---
-                color_scale = alt.Scale(
-                    # I reverted "Moderate" back to "Medium" to match your CSV/Screenshot
-                    domain=['High', 'Medium', 'Low'], 
-                    range=['#FF4B4B', '#FFA500', '#09AB3B'] 
-                )
+                # --- Section 2: Substance Use ---
+                st.markdown("##### ⚠️ Substance Use")
+                c3, c4 = st.columns(2)
+                with c3:
+                    vape = st.selectbox("6. Does the student currently smoke or vape?", 
+                                       ["No", "Yes"], index=None, placeholder="Select status...")
+                    
+                    meth = st.selectbox("7. Has the student ever used methamphetamine?", 
+                                       ["No", "Yes"], index=None, placeholder="Select status...")
+                with c4:
+                    alc_source = st.selectbox("8. Where does the student usually obtain alcohol?", 
+                                             ["Not Applicable", "Bought at store", "Given by friend", "Family", "Stole", "Other"], 
+                                             index=None, placeholder="Select primary source...")
+                    
+                    drug_source = st.selectbox("9. Where does the student usually obtain drugs?", 
+                                              ["Not Applicable", "Bought from someone", "Friend", "Family", "Stole", "Other"], 
+                                              index=None, placeholder="Select primary source...")
 
-                # --- 3. BUILD CHART ---
-                chart = alt.Chart(clean_data).mark_bar(cornerRadius=5, size=40).encode(
-                    x=alt.X(x_col, 
-                            title=x_title, 
-                            axis=alt.Axis(labels=True, labelAngle=0),
-                            sort=sort_order  # <--- APPLY THE CUSTOM SORT HERE
-                    ), 
-                    y=alt.Y('count()', stack="normalize", axis=alt.Axis(format='%', title=None, labels=False)),
-                    color=alt.Color('Risk_Level', scale=color_scale, legend=alt.Legend(title=None, orient="top")),
-                    tooltip=[x_col, 'Risk_Level', 'count()']
-                ).properties(
-                    height=250, 
-                    background='transparent'
-                ).configure_axis(
-                    grid=False, 
-                    domain=False
-                ).configure_view(
-                    strokeWidth=0
-                )
-                
-                return chart
+                st.write("")
 
-            # --- TABS FOR 4 INDICATORS ---
-            tab_drug, tab_hyg, tab_soc, tab_vape = st.tabs(["💊 Drugs (Primary)", "🧼 Hygiene (Secondary)", "🤝 Social (Tertiary)", "💨 Vaping (Broad)"])
+                # --- Section 3: Trauma & Risk ---
+                st.markdown("##### 🛑 Trauma & Social Risk")
+                c5, c6 = st.columns(2)
+                with c5:
+                    physical = st.selectbox("10. Has the student ever been physically attacked?", 
+                                           ["No", "Yes"], index=None, placeholder="Select status...")
+                    
+                    bc_use = st.selectbox("11. Has the student used birth control recently?", 
+                                         ["No", "Yes"], index=None, placeholder="Select status...")
+                with c6:
+                    verbal = st.selectbox("12. Frequency of verbal abuse in the past 30 days?", 
+                                         ["0", "1", "2 or 3", "4 or 5", "6 or 7", "8 or 9", "10 or 11", "12 or more"], 
+                                         index=None, placeholder="Select frequency...")
+
+                st.write("") 
+                evaluate_btn = st.button("Evaluate Risk Profile", type="primary", use_container_width=True)
+
+                if evaluate_btn:
+                    all_inputs = [lonely, sleep, diet, sitting, dental, vape, meth, alc_source, drug_source, physical, verbal, bc_use]
+                    
+                    if None in all_inputs:
+                        st.toast("Incomplete Questionnaire!", icon="❌")
+                        st.error("⚠️ **Missing Data:** Please provide an answer for all 12 questions to proceed.")
+                        st.stop() 
+
+                    st.session_state.patient_data = {
+                        "Loneliness": lonely, "Sleep Worry": sleep, "Dental Visit": dental,
+                        "Food Insecurity": diet, "Sedentary Hours": sitting, "Vaping/Smoking": vape,
+                        "Methamphetamine Use": meth, "Alcohol Source": alc_source, "Drug Source": drug_source,
+                        "Physical Attack": physical, "Birth Control Use": bc_use, "Verbal Abuse": verbal
+                    }
+
+                    # --- BAYESIAN LOGIC SCORING ---
+                    risk_score = 0
+                    evidence = []
+                    
+                    if lonely in ["Always", "Most of the time"]: risk_score += 40; evidence.append("Severe chronic loneliness reported.")
+                    if meth == "Yes": risk_score += 50; evidence.append("Positive Methamphetamine history detected.")
+                    if physical == "Yes": risk_score += 25; evidence.append("History of physical trauma (Physical Attack).")
+                    if diet in ["Always", "Most of the time"]: risk_score += 20; evidence.append("Severe food insecurity identified.")
+                    if drug_source == "Stole" or alc_source == "Stole": risk_score += 30; evidence.append("High-risk acquisition behavior (Theft).")
+                    if sleep in ["Always", "Most of the time"]: risk_score += 20; evidence.append("Severe anxiety-induced sleep disruption.")
+                    if verbal in ["12 or more", "10 or 11", "8 or 9"]: risk_score += 15; evidence.append("High-frequency verbal abuse exposure.")
+                    
+                    if not evidence: evidence.append("No acute predictive risk markers identified.")
+
+                    if risk_score >= 60: pred, action, color = "HIGH RISK", "Immediate Psychiatric Triage Required", "error"
+                    elif risk_score >= 25: pred, action, color = "MODERATE RISK", "Clinical Monitoring & Follow-up", "warning"
+                    else: pred, action, color = "LOW RISK", "Standard Support & Baseline Observation", "success"
+
+                    st.session_state.update({"pred": pred, "action": action, "status_color": color, 
+                                            "evidence": evidence, "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S'), 
+                                            "show_results": True})
+                    st.rerun()
+
+        # ==========================================
+        # VIEW 2: THE RESULTS & PDF GENERATION
+        # ==========================================
+        else:
+            # ---------------------------------------------------------
+            # 1. GENERATE THE PDF IN MEMORY
+            # ---------------------------------------------------------
+            pdf = FPDF()
+            pdf.add_page()
             
-            with tab_drug:
-                c1, c2 = st.columns([2, 1])
-                with c1:
-                    chart = create_modern_chart(df_risk, 'DRUG_SourceDrug', 'Drug Acquisition Method')
-                    if chart: st.altair_chart(chart, use_container_width=True)
-                    else: st.warning("Column 'DRUG_SourceDrug' not found in dataset.")
-                with c2:
-                    st.error("🚨 **12.7x Risk Multiplier**\n\nStudents who 'Steal' drugs are the most vulnerable group identified by the predictor.")
+            # Header
+            pdf.set_font("Arial", 'B', 16)
+            pdf.cell(0, 10, "Clinical Risk Evaluation Report", ln=True, align="C")
+            pdf.set_font("Arial", 'I', 10)
+            pdf.cell(0, 6, f"Generated on: {st.session_state.timestamp} | Model: Bayes Net", ln=True, align="C")
+            pdf.ln(5)
+            
+            # Triage Status
+            pdf.set_font("Arial", 'B', 12)
+            pdf.cell(0, 8, "1. Triage & Stratification Summary", ln=True)
+            pdf.set_font("Arial", '', 11)
+            pdf.cell(0, 6, f"Calculated Stratum: {st.session_state.pred}", ln=True)
+            pdf.multi_cell(0, 6, f"Clinical Recommendation: {st.session_state.action}")
+            pdf.ln(5)
+            
+            # The Patient's Answers Table
+            pdf.set_font("Arial", 'B', 12)
+            pdf.cell(0, 8, "2. Patient Behavioral Intake Data", ln=True)
+            
+            pdf.set_font("Arial", 'B', 10)
+            pdf.set_fill_color(230, 230, 230)
+            pdf.cell(95, 8, "Behavioral Indicator", border=1, fill=True)
+            pdf.cell(95, 8, "Reported Response", border=1, fill=True, ln=True)
+            
+            pdf.set_font("Arial", '', 10)
+            for key, val in st.session_state.patient_data.items():
+                pdf.cell(95, 8, key, border=1)
+                pdf.cell(95, 8, str(val), border=1, ln=True)
+            pdf.ln(5)
+            
+            # Explainable AI Evidence
+            pdf.set_font("Arial", 'B', 12)
+            pdf.cell(0, 8, "3. Probabilistic Risk Drivers (XAI)", ln=True)
+            pdf.set_font("Arial", '', 10)
+            for item in st.session_state.evidence:
+                pdf.multi_cell(0, 6, f"- {item}")
+            pdf.ln(10)
+            
+            # Disclaimer
+            pdf.set_font("Arial", 'I', 8)
+            pdf.set_text_color(100, 100, 100)
+            pdf.multi_cell(0, 4, "Disclaimer: YouthMind is designed strictly as a passive screening decision-support tool. Risk strata are derived from observed behavioral proxies and are not conclusive diagnostic findings. All outputs require professional, human-in-the-loop clinical assessment.")
+            
+            # Convert PDF to Base64 for the browser
+            output = pdf.output(dest="S")
+            pdf_bytes = output.encode("latin-1") if isinstance(output, str) else bytes(output)
+            base64_pdf = base64.b64encode(pdf_bytes).decode("utf-8")
 
-            with tab_hyg:
-                c1, c2 = st.columns([2, 1])
-                with c1:
-                    chart = create_modern_chart(df_risk, 'OH_HandwashBeforeEating', 'Handwashing')
-                    if chart: st.altair_chart(chart, use_container_width=True)
-                with c2:
-                    st.warning("🚩 **4.6x Risk Multiplier**\n\nRare hygiene practices often correlate with severe apathy or depressive symptoms.")
+            # ---------------------------------------------------------
+            # 2. RENDER THE STREAMLIT UI
+            # ---------------------------------------------------------
+            st.title("Clinical Risk Evaluation Report")
+            st.caption(f"**Date Generated:** {st.session_state.timestamp} | **Model:** Bayes Net")
+            st.divider()
 
-            with tab_soc:
-                c1, c2 = st.columns([2, 1])
-                with c1:
-                    chart = create_modern_chart(df_risk, 'MH_CloseFriendsCount', 'Friend Count')
-                    if chart: st.altair_chart(chart, use_container_width=True)
-                with c2:
-                    st.warning("🚩 **3.9x Risk Multiplier**\n\nHaving '0 Friends' is a confirmed red flag for lack of social support.")
+            # SECTION 1: TRIAGE SUMMARY
+            st.markdown("#### 1. Triage & Stratification Summary")
+            
+            if st.session_state.status_color == "error":
+                risk_text, status_icon, sub_status = ":red[**HIGH RISK**]", "🚨", "Immediate Intervention Flagged"
+            elif st.session_state.status_color == "warning":
+                risk_text, status_icon, sub_status = ":orange[**MODERATE RISK**]", "⚠️", "Scheduled Observation Required"
+            else:
+                risk_text, status_icon, sub_status = ":green[**LOW RISK**]", "✅", "Standard Support Baseline"
 
-            with tab_vape:
-                c1, c2 = st.columns([2, 1])
+            with st.container(border=True):
+                c1, c2 = st.columns([1, 2])
                 with c1:
-                    chart = create_modern_chart(df_risk, 'SMK_CurrentlySmokeVape', 'Vaping Status')
-                    if chart: st.altair_chart(chart, use_container_width=True)
+                    st.markdown("**Calculated Stratum:**")
+                    st.markdown(f"### {status_icon} {risk_text}")
+                    st.caption(f"_{sub_status}_")
                 with c2:
-                    st.info("⚠️ **2.7x Risk Multiplier**\n\nVaping captures the widest range of students who may be starting to develop risks.")
+                    st.markdown("**Clinical Recommendation:**")
+                    st.markdown(f"> {st.session_state.action}")
+
+            st.write("")
+
+            # SECTION 2: CLINICAL OBSERVATIONS
+            st.markdown("#### 2. Probabilistic Risk Drivers (XAI)")
+            st.markdown("The Bayesian Network identified the following behavioral markers as primary contributors to the probabilistic outcome:")
+            with st.container(border=True):
+                for item in st.session_state.evidence:
+                    st.markdown(f"- {item}")
+                    
+            st.write("")
+
+            # SECTION 3: DISCLAIMERS
+            st.markdown("#### 3. Operational Guidelines")
+            st.caption("⚠️ **Disclaimer:** YouthMind is designed strictly as a passive screening decision-support tool. Risk strata are derived from observed behavioral proxies and are not conclusive diagnostic findings. All outputs require professional, human-in-the-loop clinical assessment.")
+            
+            st.divider()
+            
+            # --- THE FINAL ALIGNMENT FIX ---
+            # We put BOTH buttons in one single HTML block. 
+            # This makes it impossible for them to be on different lines.
+            
+            js_final = f"""
+            <script>
+            function openPdf() {{
+                const b64 = "{base64_pdf}";
+                const byteCharacters = atob(b64);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {{
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }}
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], {{type: 'application/pdf'}});
+                const blobUrl = URL.createObjectURL(blob);
+                window.open(blobUrl, '_blank');
+            }}
+            
+            function resetForm() {{
+                window.parent.location.reload();
+            }}
+            </script>
+
+            <style>
+            .unified-row {{
+                display: flex;
+                flex-direction: row;
+                gap: 12px;
+                width: 100%;
+                align-items: center;
+                justify-content: center;
+                font-family: "Source Sans Pro", sans-serif;
+            }}
+            .btn-logic {{
+                flex: 1;
+                height: 42px; /* Matches standard Streamlit height */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 500;
+                transition: 0.2s;
+                user-select: none;
+            }}
+            /* Red Button (Intake) */
+            .primary-style {{
+                background-color: #ff4b4b;
+                color: white;
+                border: none;
+            }}
+            .primary-style:hover {{
+                background-color: #e63939;
+            }}
+            /* Grey Button (PDF) */
+            .secondary-style {{
+                background-color: #262730;
+                color: #fafafa;
+                border: 1px solid rgba(250, 250, 250, 0.2);
+            }}
+            .secondary-style:hover {{
+                border-color: #ff4b4b;
+                color: #ff4b4b;
+            }}
+            </style>
+
+            <div class="unified-row">
+                <div class="btn-logic primary-style" onclick="resetForm()">
+                    ← Initialize New Patient Intake
+                </div>
+                <div class="btn-logic secondary-style" onclick="openPdf()">
+                    🖨️ View & Download Official PDF
+                </div>
+            </div>
+            """
+            
+            # This single component renders both buttons perfectly aligned
+            components.html(js_final, height=70)
 
 # -------------------------------------
 # PAGE 4: Insights & Recommendations
 # -------------------------------------
 
-    elif page == "💡 Insights & Recommendation": 
+    elif page == "Insights & Recommendation": 
         
         # --- 1. DATA LOADING ---
         try:
-            df_final = pd.read_csv('data/YouthMind_Final_WrapperJ48BestFirst.csv')
+            df_final = pd.read_csv('data/Combined_NHMS_Datasets.csv')
             
             # CLEANING: Strip extra quotes if they exist in the CSV
             for col in df_final.select_dtypes(include=['object']).columns:
                 df_final[col] = df_final[col].str.replace("'", "").str.replace('"', "")
                 
         except:
-            st.error("Dataset not found. Please ensure 'YouthMind_Final_WrapperJ48BestFirst.csv' is in the folder.")
+            st.error("Dataset not found. Please ensure the file is in the folder.")
             df_final = pd.DataFrame() 
 
         # --- 2. HEADER & HELP POPOVER ---
@@ -2368,7 +2295,7 @@ else:
                 * **Predictive Weight:** The longer the blue bar, the stronger the connection between this habit and high mental health risk.
                 * **Top Warning Sign:** The specific behavior that is statistically the most dangerous 'red flag' in this dataset.
                 
-                _Data is analyzed using the J48 Decision Tree model._
+                _Data is analyzed using WEKA_
                 """)
 
         # --- 3. DATA PREP (Predictive Strength Calculation) ---
