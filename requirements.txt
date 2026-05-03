@@ -6,4 +6,4 @@ streamlit-folium
 scikit-learn
 numpy
 FPDF
-fpdp2
+fpdf2
