@@ -603,7 +603,7 @@ else:
         st.markdown("<hr style='margin: -9px 0;'>", unsafe_allow_html=True)
 
         # --- 3. FILTERS ---
-        if page in ["🔮 Risk Assessment Predictor", "💡 Insights & Recommendation"]:
+        if page in ["Risk Assessment Predictor", "Insights & Recommendation"]:
 
             # --- OPTION A: LOCKED MODE (For Page 3 & 4) ---
             st.markdown("<h5 style='margin: -9px 2px 10px; padding: 0;'>🔍 Filtering</h5>", unsafe_allow_html=True)
@@ -1962,6 +1962,18 @@ else:
             st.title("Student Risk Assessment Tool")
             st.caption("Decision Support System | Bayesian Network Inference Engine")
             
+            # Updated Expander with Correct Harmonization & LMT Wrapper Logic
+            with st.expander("Model Development & Feature Selection Methodology", expanded=True):
+                st.markdown("""
+                **Data Engineering & Feature Optimization Pipeline:**
+                
+                * **Cross-Cohort Feature Harmonization:** To execute a uniform cross-year analysis within WEKA, the 2017 and 2022 NHMS datasets were systematically aligned. Feature columns unique to individual years were excluded—specifically removing the **Internet Access** questions from the 2017 cohort and the **COVID-19** questions from the 2022 cohort—ensuring the algorithm processed an identical baseline feature space across both populations.
+                * **Target Stratification (3ST Framework):** Because the raw national survey lacks explicit risk labels, target risk classes (**Low, Medium, High Risk**) were engineered using rules aligned with the *Three-Step Theory of Suicide*, prioritizing historical self-harm behavior over reported affect.
+                * **Addressing Class Imbalance:** The high-risk target group represents a severe minority (**8.02% of the entire sample**). Consequently, traditional classification Accuracy and AUC-ROC were rejected due to statistical masking by the healthy majority. The model was optimized strictly using the **Weighted Precision-Recall Curve (PRC)** to focus purely on high-risk prediction accuracy.
+                * **Dimensionality Reduction via LMT-Wrapper:** The original national survey consists of **148 raw questions**. To eliminate questionnaire fatigue in practical school environments, an automated **Wrapper selection method** was executed in WEKA. Out of the tested base estimators, the **Logistic Model Tree (LMT)** was algorithmically selected because it achieved the highest baseline PRC score. This automated process evaluated conditional attribute combinations rather than isolated variables, achieving a **91.8% reduction in feature space** to extract the final **12 optimal behavioral attributes**.
+                * **The Algorithmic Architecture:** Benchmarked across five algorithms, the **Bayes Net classifier** emerged as the top performer, achieving a peak **PRC score of 0.833** by capturing the deep, interdependent conditional web of adolescent behaviors.
+                """)
+
             with st.expander("Clinical Implementation Guide", expanded=False):
                 st.markdown("""
                 **Model Overview:** This tool evaluates behavioral proxies using the validated 12-Attribute Bayes Net framework. 
@@ -2185,87 +2197,44 @@ else:
             st.caption("⚠️ **Disclaimer:** YouthMind is designed strictly as a passive screening decision-support tool. Risk strata are derived from observed behavioral proxies and are not conclusive diagnostic findings. All outputs require professional, human-in-the-loop clinical assessment.")
             
             st.divider()
-            
-            # --- THE FINAL ALIGNMENT FIX ---
-            # We put BOTH buttons in one single HTML block. 
-            # This makes it impossible for them to be on different lines.
-            
-            js_final = f"""
-            <script>
-            function openPdf() {{
-                const b64 = "{base64_pdf}";
-                const byteCharacters = atob(b64);
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++) {{
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-                }}
-                const byteArray = new Uint8Array(byteNumbers);
-                const blob = new Blob([byteArray], {{type: 'application/pdf'}});
-                const blobUrl = URL.createObjectURL(blob);
-                window.open(blobUrl, '_blank');
-            }}
-            
-            function resetForm() {{
-                window.parent.location.reload();
-            }}
-            </script>
 
-            <style>
-            .unified-row {{
-                display: flex;
-                flex-direction: row;
-                gap: 12px;
-                width: 100%;
-                align-items: center;
-                justify-content: center;
-                font-family: "Source Sans Pro", sans-serif;
-            }}
-            .btn-logic {{
-                flex: 1;
-                height: 42px; /* Matches standard Streamlit height */
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 8px;
-                cursor: pointer;
-                font-size: 14px;
-                font-weight: 500;
-                transition: 0.2s;
-                user-select: none;
-            }}
-            /* Red Button (Intake) */
-            .primary-style {{
-                background-color: #ff4b4b;
-                color: white;
-                border: none;
-            }}
-            .primary-style:hover {{
-                background-color: #e63939;
-            }}
-            /* Grey Button (PDF) */
-            .secondary-style {{
-                background-color: #262730;
-                color: #fafafa;
-                border: 1px solid rgba(250, 250, 250, 0.2);
-            }}
-            .secondary-style:hover {{
-                border-color: #ff4b4b;
-                color: #ff4b4b;
-            }}
-            </style>
+            # Renders both buttons side-by-side using native Streamlit architecture
+            col1, col2 = st.columns(2)
 
-            <div class="unified-row">
-                <div class="btn-logic primary-style" onclick="resetForm()">
-                    ← Initialize New Patient Intake
-                </div>
-                <div class="btn-logic secondary-style" onclick="openPdf()">
-                    🖨️ View & Download Official PDF
-                </div>
-            </div>
-            """
-            
-            # This single component renders both buttons perfectly aligned
-            components.html(js_final, height=70)
+            with col1:
+                # Red Button matching standard primary style
+                if st.button("← Initialize New Patient Intake", use_container_width=True, type="primary"):
+                    # 1. Clear out your 12 inputs/checkboxes state here if needed
+                    # e.g., st.session_state.loneliness_checkbox = False
+                    
+                    # 2. Toggle off the results flag to show the clean form again
+                    st.session_state.show_results = False
+                    
+                    # 3. Explicitly tell Streamlit to stay on Page 3
+                    st.session_state.active_page = "Page 3"
+                    
+                    # 4. Trigger an immediate smooth rerun without reloading the whole browser
+                    st.rerun()
+
+            with col2:
+                # Trigger your PDF code cleanly without mixing javascript inside raw components
+                # We use a standard native button wrapper to run the base64 injector safely
+                if st.button("🖨️ View & Download Official PDF", use_container_width=True):
+                    js_pdf = f"""
+                    <script>
+                        const b64 = "{base64_pdf}";
+                        const byteCharacters = atob(b64);
+                        const byteNumbers = new Array(byteCharacters.length);
+                        for (let i = 0; i < byteCharacters.length; i++) {{
+                            byteNumbers[i] = byteCharacters.charCodeAt(i);
+                        }}
+                        const byteArray = new Uint8Array(byteNumbers);
+                        const blob = new Blob([byteArray], {{type: 'application/pdf'}});
+                        const blobUrl = URL.createObjectURL(blob);
+                        window.open(blobUrl, '_blank');
+                    </script>
+                    """
+                    components.html(js_pdf, height=0)
 
 # -------------------------------------
 # PAGE 4: Insights & Recommendations
