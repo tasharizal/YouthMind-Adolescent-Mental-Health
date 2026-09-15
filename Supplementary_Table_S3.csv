@@ -1,0 +1,77 @@
+High,Low,Medium,Attribute,Category Value
+127 (15.8%),161 (1.9%),67 (8.3%),MH_LonelyFrequency,Always
+194 (24.2%),545 (6.5%),182 (22.5%),MH_LonelyFrequency,Most of the time
+87 (10.8%),2483 (29.6%),148 (18.3%),MH_LonelyFrequency,Never
+128 (16.0%),2722 (32.4%),127 (15.7%),MH_LonelyFrequency,Rarely
+265 (33.0%),2475 (29.5%),285 (35.2%),MH_LonelyFrequency,Sometimes
+1 (0.1%),3 (0.0%),0 (0.0%),MH_LonelyFrequency,Unknown
+112 (14.0%),143 (1.7%),61 (7.5%),MH_WorryNoSleepFrequency,Always
+147 (18.3%),425 (5.1%),117 (14.5%),MH_WorryNoSleepFrequency,Most of the time
+114 (14.2%),3293 (39.3%),190 (23.5%),MH_WorryNoSleepFrequency,Never
+188 (23.4%),2768 (33.0%),211 (26.1%),MH_WorryNoSleepFrequency,Rarely
+237 (29.6%),1753 (20.9%),230 (28.4%),MH_WorryNoSleepFrequency,Sometimes
+4 (0.5%),7 (0.1%),0 (0.0%),MH_WorryNoSleepFrequency,Unknown
+14 (1.7%),29 (0.3%),11 (1.4%),DRUG_SourceDrug,Bought from someone
+3 (0.4%),2 (0.0%),2 (0.2%),DRUG_SourceDrug,Family
+8 (1.0%),5 (0.1%),3 (0.4%),DRUG_SourceDrug,Friend
+13 (1.6%),6 (0.1%),0 (0.0%),DRUG_SourceDrug,Gave someone else money
+3 (0.4%),10 (0.1%),0 (0.0%),DRUG_SourceDrug,I give someone else money to buy it for me
+678 (84.5%),8042 (95.9%),756 (93.4%),DRUG_SourceDrug,Not Applicable
+4 (0.5%),6 (0.1%),0 (0.0%),DRUG_SourceDrug,Other
+21 (2.6%),5 (0.1%),3 (0.4%),DRUG_SourceDrug,Stole
+31 (3.9%),155 (1.8%),12 (1.5%),DRUG_SourceDrug,Unknown
+27 (3.4%),129 (1.5%),22 (2.7%),DRUG_SourceDrug,
+39 (4.9%),107 (1.3%),21 (2.6%),ALC_SourceAlcohol,Bought at store
+55 (6.9%),250 (3.0%),30 (3.7%),ALC_SourceAlcohol,Family
+25 (3.1%),75 (0.9%),13 (1.6%),ALC_SourceAlcohol,Friends
+16 (2.0%),12 (0.1%),6 (0.7%),ALC_SourceAlcohol,Gave someone money
+541 (67.5%),7128 (85.0%),640 (79.1%),ALC_SourceAlcohol,Not Applicable
+15 (1.9%),50 (0.6%),5 (0.6%),ALC_SourceAlcohol,Other
+2 (0.2%),10 (0.1%),1 (0.1%),ALC_SourceAlcohol,Someone else money
+4 (0.5%),5 (0.1%),1 (0.1%),ALC_SourceAlcohol,Stole
+22 (2.7%),101 (1.2%),15 (1.9%),ALC_SourceAlcohol,Unknown
+83 (10.3%),651 (7.8%),77 (9.5%),ALC_SourceAlcohol,
+30 (3.7%),72 (0.9%),13 (1.6%),DIET_HungryNotEnoughFood,Always
+45 (5.6%),117 (1.4%),31 (3.8%),DIET_HungryNotEnoughFood,Most of the time
+358 (44.6%),5032 (60.0%),385 (47.6%),DIET_HungryNotEnoughFood,Never
+210 (26.2%),2026 (24.2%),221 (27.3%),DIET_HungryNotEnoughFood,Rarely
+159 (19.8%),1139 (13.6%),158 (19.5%),DIET_HungryNotEnoughFood,Sometimes
+0 (0.0%),3 (0.0%),1 (0.1%),DIET_HungryNotEnoughFood,Unknown
+117 (14.6%),1134 (13.5%),90 (11.1%),VL_VerbalAbuseTimes,1
+22 (2.7%),41 (0.5%),19 (2.3%),VL_VerbalAbuseTimes,10 or 11
+144 (18.0%),295 (3.5%),89 (11.0%),VL_VerbalAbuseTimes,12 or more
+135 (16.8%),1244 (14.8%),145 (17.9%),VL_VerbalAbuseTimes,2 or 3
+21 (2.6%),169 (2.0%),36 (4.4%),VL_VerbalAbuseTimes,4 or 5
+47 (5.9%),159 (1.9%),38 (4.7%),VL_VerbalAbuseTimes,4 to 5 times
+44 (5.5%),129 (1.5%),43 (5.3%),VL_VerbalAbuseTimes,6 or 7
+26 (3.2%),58 (0.7%),21 (2.6%),VL_VerbalAbuseTimes,8 or 9
+14 (1.7%),63 (0.8%),7 (0.9%),VL_VerbalAbuseTimes,Unknown
+232 (28.9%),5097 (60.8%),321 (39.7%),VL_VerbalAbuseTimes,
+512 (63.8%),6890 (82.1%),597 (73.8%),VL_EverPhysicalAttack,No
+12 (1.5%),59 (0.7%),5 (0.6%),VL_EverPhysicalAttack,Unknown
+278 (34.7%),1440 (17.2%),207 (25.6%),VL_EverPhysicalAttack,Yes
+157 (19.6%),2421 (28.9%),176 (21.8%),PA_HoursSitting,1 to 2
+193 (24.1%),2442 (29.1%),206 (25.5%),PA_HoursSitting,3 to 4
+120 (15.0%),1094 (13.0%),127 (15.7%),PA_HoursSitting,5 to 6
+52 (6.5%),404 (4.8%),61 (7.5%),PA_HoursSitting,7 to 8
+126 (15.7%),1231 (14.7%),102 (12.6%),PA_HoursSitting,Less than 1
+146 (18.2%),782 (9.3%),133 (16.4%),PA_HoursSitting,More than 8
+8 (1.0%),15 (0.2%),4 (0.5%),PA_HoursSitting,Unknown
+724 (90.3%),8237 (98.2%),790 (97.7%),DRUG_EverUseMeth,No
+14 (1.7%),74 (0.9%),5 (0.6%),DRUG_EverUseMeth,Unknown
+64 (8.0%),78 (0.9%),14 (1.7%),DRUG_EverUseMeth,Yes
+29 (3.6%),150 (1.8%),18 (2.2%),SEX_LastBirthControlUse,Do not know
+423 (52.7%),3660 (43.6%),377 (46.6%),SEX_LastBirthControlUse,Never
+304 (37.9%),4396 (52.4%),392 (48.5%),SEX_LastBirthControlUse,No
+15 (1.9%),76 (0.9%),7 (0.9%),SEX_LastBirthControlUse,Unknown
+31 (3.9%),107 (1.3%),15 (1.9%),SEX_LastBirthControlUse,Yes
+638 (79.6%),7510 (89.5%),695 (85.9%),SMK_CurrentlySmokeVape,No
+6 (0.7%),21 (0.3%),2 (0.2%),SMK_CurrentlySmokeVape,Unknown
+158 (19.7%),858 (10.2%),112 (13.8%),SMK_CurrentlySmokeVape,Yes
+75 (9.4%),513 (6.1%),53 (6.6%),OH_LastDentalVisit, Between 12 and 24 months ago
+29 (3.6%),406 (4.8%),32 (4.0%),OH_LastDentalVisit,Between 12 and 24 months ago
+238 (29.7%),2505 (29.9%),224 (27.7%),OH_LastDentalVisit,Do not know
+118 (14.7%),824 (9.8%),91 (11.2%),OH_LastDentalVisit,More than 24 months ago
+96 (12.0%),770 (9.2%),69 (8.5%),OH_LastDentalVisit,Never
+245 (30.5%),3356 (40.0%),340 (42.0%),OH_LastDentalVisit,Past 12 months
+1 (0.1%),15 (0.2%),0 (0.0%),OH_LastDentalVisit,Unknown
